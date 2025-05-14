@@ -17,6 +17,7 @@ lego_viewer/
 ├── package.json            # Project metadata and scripts (for Tailwind CSS)
 ├── tailwind.config.js      # Tailwind CSS configuration
 ├── postcss.config.js       # PostCSS configuration (for Tailwind CSS)
+├── .gitignore              # Specifies intentionally untracked files for Git
 ├── src/
 │   ├── main.js           # Application entry point: initializes and connects modules
 │   ├── viewer.js         # Manages the Three.js scene, camera, renderer, and user controls
@@ -64,7 +65,7 @@ This project relies on ES modules (requiring an HTTP/S server) and a build step 
     ```
 
     (Alternatively, `npm run build` which currently also just runs `build:css`)
-    _Note: You need to re-run this command if you make changes to `styles/tailwind-input.css` or add/remove Tailwind classes in your HTML/JS files._
+    _Note: You need to re-run this command if you make changes to `styles/tailwind-input.css` or add/remove Tailwind classes in your HTML/JS files to see those changes._
 
 4.  **Serve the Files:**
     Use a local HTTP server. Here are a few common options:
@@ -86,7 +87,31 @@ This project relies on ES modules (requiring an HTTP/S server) and a build step 
       This will typically serve the site on `http://localhost:3000` (check terminal output).
 
     - **Using VS Code Live Server:**
-      The "Live Server" extension can serve `index.html` (ensure it serves after CSS is built).
+      The "Live Server" extension can serve `index.html` (ensure it serves after CSS is built if you are making CSS changes).
+
+## Deploying to Vercel
+
+This project can be easily deployed to [Vercel](https://vercel.com/) for free.
+
+1.  **Push your project to GitHub:** Ensure all your code, including the `package.json`, `tailwind.config.js`, `postcss.config.js`, your `.gitignore` file, and your generated `styles/main.css` (after running `npm run build:css`), is pushed to a GitHub repository.
+
+2.  **Import Project to Vercel:**
+
+    - Sign up or log in to Vercel using your GitHub account.
+    - Click "Add New..." -> "Project".
+    - Import your `lego_viewer` GitHub repository.
+
+3.  **Configure Project Settings on Vercel:**
+
+    - **Framework Preset:** Vercel will likely detect it as "Other" or allow you to select it. This is fine for a static site with a custom build step.
+    - **Build and Output Settings:**
+      - **Build Command:** Set this to `npm run build` (or `npm run build:css`). Vercel will run this command after installing dependencies.
+      - **Output Directory:** This is CRUCIAL. Because your `index.html` is at the root and the build command generates CSS in place, you need to tell Vercel to serve the root directory. **Set the "Output Directory" in Vercel's settings to `.` (a single dot)**. If the Vercel UI has changed, you might need to clear the field if it defaults to `public`, or look for an option that specifies the project root.
+      - **Install Command:** This can usually be left as Vercel's default (e.g., `npm install`), as it will detect your `package.json`.
+
+4.  **Deploy:** Click the "Deploy" button.
+
+Vercel will then install dependencies, run your build command, and deploy the contents from your specified output directory (which should be the project root).
 
 ## Usage Guide
 
@@ -138,4 +163,4 @@ This project relies on ES modules (requiring an HTTP/S server) and a build step 
 
 - A stable internet connection is required for full functionality (see Online Requirement).
 - This project is designed for modern web browsers with good WebGL support.
-- Tailwind CSS styles are compiled and optimized; ensure you run the build command (`npm run build:css`) after making style changes or modifying HTML/JS class usage.
+- When developing locally, ensure you run the build command (`npm run build:css`) after making style changes or modifying HTML/JS class usage to see those changes reflected in the browser.
