@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LEGO Step-by-Step Viewer</title>
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js"
+      }
+    }
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body class="bg-gray-100 text-gray-800 flex flex-col items-center min-h-screen p-4 selection:bg-sky-300 selection:text-sky-900">
+    <div class="w-full max-w-4xl bg-white shadow-xl rounded-lg p-6">
+        <header class="mb-6 text-center">
+            <h1 class="text-3xl font-bold text-sky-600">LEGO&reg; Step-by-Step Viewer</h1>
+            <p class="text-gray-600 mt-2">Load an LDraw file (.ldr, .mpd) to visualize building instructions.</p>
+        </header>
+        <main>
+            <div class="mb-6 p-4 bg-sky-50 border border-sky-200 rounded-lg text-sm text-sky-700">
+                <h3 class="text-xl font-semibold mb-2 text-gray-700">Instructions & Help</h3>
+                <ul class="list-disc list-inside space-y-1 text-sm text-gray-600">
+                    <li>Click "Choose File" and select an LDraw file (<code>.ldr</code>, <code>.mpd</code>) from your computer. You can find official LDraw models at <a href="https://omr.ldraw.org/" target="_blank" class="underline hover:text-sky-500">LDraw OMR</a>.</li>
+                    <li><strong>Important:</strong> This viewer works best with <strong>packed MPD files</strong> (all parts included).
+                        If you have issues with your own files, please first test with this known-good packed model:
+                        <a href="https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/models/ldraw/officialLibrary/car.ldr_Packed.mpd" target="_blank" class="underline hover:text-sky-500">Download car.ldr_Packed.mpd</a>.
+                    </li>
+                    <li>You can find more <a href="https://github.com/mrdoob/three.js/tree/dev/examples/models/ldraw/officialLibrary" target="_blank" class="underline hover:text-sky-500">sample packed models from Three.js examples</a>.</li>
+                    <li>To pack your own LDraw models (recommended for best compatibility), you can use the <a href="https://github.com/mrdoob/three.js/blob/master/utils/packLDrawModel.js" target="_blank" class="underline hover:text-sky-500">packLDrawModel.js utility</a> along with a local LDraw parts library.</li>
+                    <li>Once a model is loaded, use the "Previous Step" and "Next Step" buttons to navigate.</li>
+                    <li>Drag with the mouse to rotate, scroll to zoom, and right-click-drag to pan the model.</li>
+                    <li>The model will be centered and scaled to fit the view.</li>
+                    <li>If you encounter "No model loaded" or "No geometry found" errors, it likely means the LDraw file is missing part definitions or is not correctly packed. Try the sample packed car model linked above.</li>
+                </ul>
+            </div>
+            <div class="mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <input type="file" id="fileInput" accept=".ldr,.mpd" class="block w-full sm:w-auto text-sm text-gray-500
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-lg file:border-0
+                    file:text-sm file:font-semibold
+                    file:bg-sky-50 file:text-sky-700
+                    hover:file:bg-sky-100 transition-colors duration-150 cursor-pointer
+                "/>
+                <div class="flex items-center gap-2">
+                    <button id="prevStepBtn" class="bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-4 rounded-lg shadow transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed">
+                        Previous Step
+                    </button>
+                    <span id="stepInfo" class="mx-4 text-sm font-medium text-gray-700 whitespace-nowrap">Step 0 of 0</span>
+                    <button id="nextStepBtn" class="bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-4 rounded-lg shadow transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed">
+                        Next Step
+                    </button>
+                    <button id="resetViewBtn" class="ml-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg shadow transition-colors duration-150">
+                        Reset View
+                    </button>
+                </div>
+            </div>
+            <div id="viewerContainer" class="shadow-lg relative">
+                <div id="loaderOverlay" class="loader-overlay hidden">
+                    <div class="loader"></div>
+                    <p class="ml-4 text-sky-600 font-semibold">Loading model...</p>
+                </div>
+            </div>
+            <div id="errorMessage" class="mt-4 p-3 bg-red-100 border border-red-300 text-red-700 rounded-lg hidden text-sm"></div>
+        </main>
+        <footer class="mt-8 text-center text-xs text-gray-500">
+            <p>LEGO&reg; is a trademark of the LEGO Group of companies which does not sponsor, authorize or endorse this site.</p>
+            <p>Powered by Three.js and LDraw&trade;.</p>
+        </footer>
+    </div>
+    <script type="module" src="src/main.js"></script>
+</body>
+</html>
