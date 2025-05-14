@@ -13,15 +13,20 @@ A web application for visualizing LEGO LDraw models step-by-step in a 3D environ
 
 ```
 lego_viewer/
-├── index.html          # Main application page
+├── index.html              # Main application page
+├── package.json            # Project metadata and scripts (for Tailwind CSS)
+├── tailwind.config.js      # Tailwind CSS configuration
+├── postcss.config.js       # PostCSS configuration (for Tailwind CSS)
 ├── src/
-│   ├── main.js         # Application entry point: initializes and connects modules
-│   ├── viewer.js       # Manages the Three.js scene, camera, renderer, and user controls
-│   ├── ldrawLoader.js  # Handles LDraw file loading, parsing, and parts library integration
-│   └── ui.js           # Manages user interface elements, event handling, and DOM updates
+│   ├── main.js           # Application entry point: initializes and connects modules
+│   ├── viewer.js         # Manages the Three.js scene, camera, renderer, and user controls
+│   ├── ldrawLoader.js    # Handles LDraw file loading, parsing, and parts library integration
+│   └── ui.js             # Manages user interface elements, event handling, and DOM updates
 ├── styles/
-│   └── main.css        # Custom styles (utilizes Tailwind CSS via CDN)
-└── README.md           # This file
+│   ├── tailwind-input.css  # Source CSS file with Tailwind directives and custom styles
+│   └── main.css          # Generated, optimized CSS file (output of Tailwind build)
+├── test_models/            # Directory for LDraw test model files
+└── README.md               # This file
 ```
 
 ## Code Overview
@@ -35,15 +40,34 @@ The application is structured into several JavaScript modules within the `src/` 
 
 ## How to Run Locally
 
-This project relies on ES modules, which require it to be served over HTTP/S.
+This project relies on ES modules (requiring an HTTP/S server) and a build step for optimizing Tailwind CSS.
 
-1.  **Navigate to the project directory:**
+1.  **Clone the Repository (if you haven't already):**
 
     ```bash
+    git clone <repository-url>
     cd lego_viewer
     ```
 
-2.  **Serve the files using a local HTTP server.** Here are a few common options:
+2.  **Install Dependencies:**
+    This project uses `npm` to manage development dependencies for Tailwind CSS.
+
+    ```bash
+    npm install
+    ```
+
+3.  **Build CSS:**
+    Generate the optimized `styles/main.css` file using Tailwind CLI.
+
+    ```bash
+    npm run build:css
+    ```
+
+    (Alternatively, `npm run build` which currently also just runs `build:css`)
+    _Note: You need to re-run this command if you make changes to `styles/tailwind-input.css` or add/remove Tailwind classes in your HTML/JS files._
+
+4.  **Serve the Files:**
+    Use a local HTTP server. Here are a few common options:
 
     - **Using Python:**
 
@@ -54,16 +78,15 @@ This project relies on ES modules, which require it to be served over HTTP/S.
       Then open `http://localhost:8000` in your browser.
 
     - **Using Node.js (with `serve`):**
-      If you have Node.js installed, you can use the `serve` package:
 
       ```bash
       npx serve .
       ```
 
-      This will typically serve the site on `http://localhost:3000` (check terminal output for the exact URL).
+      This will typically serve the site on `http://localhost:3000` (check terminal output).
 
     - **Using VS Code Live Server:**
-      If you are using Visual Studio Code, the "Live Server" extension provides an easy way to serve the `index.html` file.
+      The "Live Server" extension can serve `index.html` (ensure it serves after CSS is built).
 
 ## Usage Guide
 
@@ -78,9 +101,10 @@ This project relies on ES modules, which require it to be served over HTTP/S.
 
 ## Dependencies & Technologies
 
-- **[Three.js](https://threejs.org/):** Core 3D graphics library (loaded via CDN).
-- **[LDrawLoader](https://threejs.org/docs/#examples/en/loaders/LDrawLoader):** Three.js loader for LDraw files (included with Three.js examples, loaded via CDN).
-- **[Tailwind CSS](https://tailwindcss.com/):** Utility-first CSS framework for styling (loaded via CDN).
+- **[Three.js](https://threejs.org/):** Core 3D graphics library (loaded via CDN through an import map).
+- **[LDrawLoader](https://threejs.org/docs/#examples/en/loaders/LDrawLoader):** Three.js loader for LDraw files (loaded via CDN).
+- **[Tailwind CSS](https://tailwindcss.com/):** Utility-first CSS framework. Used via a local build process (`npm run build:css`) for optimized production CSS.
+  - Development dependencies: `tailwindcss`, `postcss`, `autoprefixer` (managed via `package.json`).
 
 ## Known Limitations
 
@@ -103,7 +127,7 @@ This project relies on ES modules, which require it to be served over HTTP/S.
   - Very large or highly complex LDraw models (e.g., those with tens of thousands of parts or extremely detailed geometries) may strain browser resources, potentially leading to reduced performance or responsiveness.
 
 - **Online Requirement:**
-  - The application requires an active internet connection to fetch the Three.js library, Tailwind CSS, and the LDraw parts library, all of which are loaded via CDNs or remote repositories.
+  - The application requires an active internet connection to fetch the Three.js library (and its sub-modules like `LDrawLoader`) and the LDraw parts library.
 
 ## Acknowledgements
 
@@ -112,6 +136,6 @@ This project relies on ES modules, which require it to be served over HTTP/S.
 
 ## Notes
 
-- A stable internet connection is required as the LDraw parts library and other dependencies are fetched remotely via CDN.
+- A stable internet connection is required for full functionality (see Online Requirement).
 - This project is designed for modern web browsers with good WebGL support.
-- No build process is necessary; all files are served statically.
+- Tailwind CSS styles are compiled and optimized; ensure you run the build command (`npm run build:css`) after making style changes or modifying HTML/JS class usage.
