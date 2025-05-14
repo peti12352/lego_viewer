@@ -36,6 +36,4 @@ $RECYCLE.BIN/
 .env.local
 .env.*.local
 
-# Miscellaneous
-test_models/ # If your test models are very large and you don't want them in git repo directly
-             # Or if they are fetched/downloaded. If they are part of the source, remove this line. 
+# Miscellaneous 
