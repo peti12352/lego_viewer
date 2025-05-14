@@ -82,6 +82,29 @@ This project relies on ES modules, which require it to be served over HTTP/S.
 - **[LDrawLoader](https://threejs.org/docs/#examples/en/loaders/LDrawLoader):** Three.js loader for LDraw files (included with Three.js examples, loaded via CDN).
 - **[Tailwind CSS](https://tailwindcss.com/):** Utility-first CSS framework for styling (loaded via CDN).
 
+## Known Limitations
+
+- **LDraw File Compatibility:**
+
+  - The viewer works best with **packed MPD files** (Multi-Part Document files where all sub-models and parts are embedded). Unpacked models or files with missing/non-standard parts may not load correctly or completely, potentially resulting in errors like "No geometry found."
+  - Step-by-step navigation is entirely dependent on the presence and correctness of `0 STEP` commands and part metadata within the LDraw file. Models without this information will be displayed as a single, complete assembly.
+
+- **Part Loading Performance:**
+
+  - For models that are not packed, individual LDraw part files (`.dat`) are fetched remotely from the `gkjohnson/ldraw-parts-library` on GitHub. For models with many unique parts, this can lead to slow initial loading times. Using packed MPD files significantly improves loading speed as part data is embedded.
+
+- **Viewer Controls & Initial Framing:**
+
+  - The 3D view uses `OrbitControls`, allowing the user to rotate around, pan across, and zoom into the model. It does not offer first-person or "fly-through" style navigation.
+  - When a model is loaded, it is automatically framed to fit the view. The initial camera angle for this framing is predetermined to provide a comprehensive overview and is not user-configurable. However, users can freely orbit and adjust the view thereafter.
+
+- **Performance with Large Models:**
+
+  - Very large or highly complex LDraw models (e.g., those with tens of thousands of parts or extremely detailed geometries) may strain browser resources, potentially leading to reduced performance or responsiveness.
+
+- **Online Requirement:**
+  - The application requires an active internet connection to fetch the Three.js library, Tailwind CSS, and the LDraw parts library, all of which are loaded via CDNs or remote repositories.
+
 ## Acknowledgements
 
 - This project utilizes the **LDraw Parts Library** hosted by Garrett Johnson ([gkjohnson/ldraw-parts-library on GitHub](https://github.com/gkjohnson/ldraw-parts-library)) for rendering LEGO model parts.
