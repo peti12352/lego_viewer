@@ -104,14 +104,24 @@ This project can be easily deployed to [Vercel](https://vercel.com/) for free.
 3.  **Configure Project Settings on Vercel:**
 
     - **Framework Preset:** Vercel will likely detect it as "Other" or allow you to select it. This is fine for a static site with a custom build step.
-    - **Build and Output Settings:**
-      - **Build Command:** Set this to `npm run build` (or `npm run build:css`). Vercel will run this command after installing dependencies.
-      - **Output Directory:** This is CRUCIAL. Because your `index.html` is at the root and the build command generates CSS in place, you need to tell Vercel to serve the root directory. **Set the "Output Directory" in Vercel's settings to `.` (a single dot)**. If the Vercel UI has changed, you might need to clear the field if it defaults to `public`, or look for an option that specifies the project root.
-      - **Install Command:** This can usually be left as Vercel's default (e.g., `npm install`), as it will detect your `package.json`.
+    - **Build and Output Settings (Located under Project Settings -> General -> Build & Development Settings):**
+      - **Build Command:** Set this to `npm run build` (or `npm run build:css`). Vercel will run this command after installing dependencies from your `package.json`.
+      - **Output Directory:** This setting is **CRUCIAL** for your project.
+        - **Why?** Vercel, by default for "Other" frameworks or static sites, looks for a directory named `public` to serve your files from. Your project's `index.html` is at the root, and your build command generates CSS in place (`styles/main.css`).
+        - **How to fix:** You must override Vercel's default. In the "Output Directory" field in your Vercel project settings, you have a few options:
+          1.  **Enter `.` (a single dot):** This explicitly tells Vercel to use the root of your repository as the output directory.
+          2.  **Clear the field:** If the field has a default value (like `public`), try deleting it completely so it's empty. Some platforms interpret an empty output directory field as the project root.
+        - **Verification:** After changing this setting, redeploy your project. The error "No Output Directory named 'public' found" means Vercel is _still_ not recognizing the root as the output. Double-check this setting carefully in your Vercel dashboard.
+      - **Install Command:** This can usually be left as Vercel's default (e.g., `npm install` or `yarn install` if you were using Yarn), as it will detect your `package.json`.
 
 4.  **Deploy:** Click the "Deploy" button.
 
-Vercel will then install dependencies, run your build command, and deploy the contents from your specified output directory (which should be the project root).
+Vercel will then install dependencies, run your build command, and (if the Output Directory is correctly set) deploy the contents from your project root.
+
+**Troubleshooting Vercel Deployment:**
+
+- **Error: "No Output Directory named 'public' found"**: This is the most common issue for projects like this. It means the "Output Directory" setting in Vercel (Project Settings -> General -> Build & Development Settings) is not correctly pointing to your project's root. Ensure it is set to `.` or is empty, as described above. Make sure you save the changes in Vercel and trigger a new deployment.
+- **Outdated `caniuse-lite` warning (`Browserslist: caniuse-lite is outdated`):** This is a warning from Tailwind CSS related to browser compatibility data. While good to update eventually (`npx update-browserslist-db@latest` locally if desired, then commit `package-lock.json`), it does _not_ cause the "No Output Directory" error and shouldn't stop a successful deployment if the output directory is configured correctly.
 
 ## Usage Guide
 

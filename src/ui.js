@@ -3,15 +3,18 @@ export function setupUI({
   prevStepBtn,
   nextStepBtn,
   resetViewBtn,
+  autoPlayBtn,
   onFileSelected,
   onPrevStep,
   onNextStep,
   onResetView,
+  onAutoPlay,
 }) {
   fileInput.addEventListener("change", onFileSelected);
   prevStepBtn.addEventListener("click", onPrevStep);
   nextStepBtn.addEventListener("click", onNextStep);
   resetViewBtn.addEventListener("click", onResetView);
+  autoPlayBtn.addEventListener("click", onAutoPlay);
 }
 
 export function updateStepInfo(currentStep, totalSteps, model) {
@@ -25,13 +28,44 @@ export function updateStepInfo(currentStep, totalSteps, model) {
   }
 }
 
-export function updateButtonStates(currentStep, totalSteps, model) {
+export function updateButtonStates(
+  currentStep,
+  totalSteps,
+  model,
+  isAutoPlaying = false
+) {
   const prevStepBtn = document.getElementById("prevStepBtn");
   const nextStepBtn = document.getElementById("nextStepBtn");
-  prevStepBtn.disabled =
-    !model || currentStep <= (totalSteps > 0 ? 1 : 0) || totalSteps === 0;
+  const autoPlayBtn = document.getElementById("autoPlayBtn");
+
+  const noModelOrNoSteps = !model || totalSteps === 0;
+
+  prevStepBtn.disabled = noModelOrNoSteps || currentStep <= 1 || isAutoPlaying;
   nextStepBtn.disabled =
-    !model || currentStep >= totalSteps || totalSteps === 0;
+    noModelOrNoSteps || currentStep >= totalSteps || isAutoPlaying;
+
+  if (autoPlayBtn) {
+    autoPlayBtn.classList.toggle("hidden", !model || !model.children.length);
+    autoPlayBtn.disabled = noModelOrNoSteps;
+
+    if (isAutoPlaying) {
+      updateAutoPlayButtonText("Pause");
+    } else if (currentStep >= totalSteps && totalSteps > 0) {
+      updateAutoPlayButtonText("Replay");
+    } else {
+      updateAutoPlayButtonText("Play");
+    }
+  }
+}
+
+export function updateAutoPlayButtonText(text, isDisabled = undefined) {
+  const autoPlayBtn = document.getElementById("autoPlayBtn");
+  if (autoPlayBtn) {
+    autoPlayBtn.textContent = text;
+    if (isDisabled !== undefined) {
+      autoPlayBtn.disabled = isDisabled;
+    }
+  }
 }
 
 export function showLoader(show) {

@@ -35,7 +35,12 @@ export function initViewer() {
   controls.minDistance = 10;
   controls.maxDistance = 10000;
   controls.target.set(0, 50, 0);
-  controls.maxPolarAngle = Math.PI;
+
+  // Set camera orbital angle limits for unconstrained viewing around the target
+  controls.minPolarAngle = 0; // Default is 0 (looking from top)
+  controls.maxPolarAngle = Math.PI; // Default is Math.PI (looking from bottom) - ensures full vertical rotation
+  controls.minAzimuthAngle = -Infinity; // Default is -Infinity - ensures full horizontal rotation
+  controls.maxAzimuthAngle = Infinity; // Default is Infinity - ensures full horizontal rotation
 
   // Auto-rotation setup
   controls.autoRotate = false; // Start with it off, will be enabled on model load

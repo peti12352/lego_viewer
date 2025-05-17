@@ -2,7 +2,6 @@ import {
   initViewer,
   getScene,
   getCamera,
-  getRenderer,
   getControls,
   frameArea,
 } from "./viewer.js";
@@ -21,10 +20,15 @@ const fileInput = document.getElementById("fileInput");
 const prevStepBtn = document.getElementById("prevStepBtn");
 const nextStepBtn = document.getElementById("nextStepBtn");
 const resetViewBtn = document.getElementById("resetViewBtn");
+const autoPlayBtn = document.getElementById("autoPlayBtn");
 
 let model = null;
 let currentStep = 0;
 let totalSteps = 0;
+
+let isAutoPlaying = false;
+let autoPlayIntervalId = null;
+const AUTO_PLAY_INTERVAL = 1500;
 
 function applyStepVisibility(step) {
   if (!model) return;
@@ -56,6 +60,7 @@ function applyStepVisibility(step) {
 function onFileSelected(event) {
   const file = event.target.files[0];
   if (file) {
+    stopAutoPlay();
     showLoader(true);
     clearError();
     loadLDrawFile(
@@ -70,7 +75,6 @@ function onFileSelected(event) {
           `[Main] Model loaded. Total steps: ${totalSteps}. Initial currentStep: ${currentStep}`
         );
 
-        // Frame the loaded model and enable auto-rotate initially
         const viewerContainer = document.getElementById("viewerContainer");
         if (model && viewerContainer) {
           frameArea(model, getCamera(), getControls(), viewerContainer, true);
@@ -79,42 +83,95 @@ function onFileSelected(event) {
         applyStepVisibility(currentStep);
 
         updateStepInfo(currentStep, totalSteps, model);
-        updateButtonStates(currentStep, totalSteps, model);
+        updateButtonStates(currentStep, totalSteps, model, false);
         showLoader(false);
       },
       (error) => {
         displayError(error);
         showLoader(false);
-        updateButtonStates(currentStep, totalSteps, model);
+        updateButtonStates(currentStep, totalSteps, model, false);
       }
     );
   }
 }
 
 function onPrevStep() {
+  stopAutoPlay();
   if (currentStep > 1 && model) {
     currentStep--;
     applyStepVisibility(currentStep);
     console.log(`[Main] Set step to: ${currentStep}`);
     updateStepInfo(currentStep, totalSteps, model);
-    updateButtonStates(currentStep, totalSteps, model);
+    updateButtonStates(currentStep, totalSteps, model, isAutoPlaying);
   }
 }
 
-function onNextStep() {
+function onNextStep(isTriggeredByAutoPlay = false) {
+  if (!isTriggeredByAutoPlay) {
+    stopAutoPlay();
+  }
   if (currentStep < totalSteps && model) {
     currentStep++;
     applyStepVisibility(currentStep);
     console.log(`[Main] Set step to: ${currentStep}`);
     updateStepInfo(currentStep, totalSteps, model);
-    updateButtonStates(currentStep, totalSteps, model);
+    updateButtonStates(currentStep, totalSteps, model, isAutoPlaying);
+
+    if (isAutoPlaying && currentStep >= totalSteps) {
+      stopAutoPlay(true);
+    }
+  }
+}
+
+function startAutoPlay() {
+  if (isAutoPlaying || !model || totalSteps === 0) return;
+
+  isAutoPlaying = true;
+  console.log("[Main] Auto-play started.");
+  updateButtonStates(currentStep, totalSteps, model, isAutoPlaying);
+
+  if (currentStep === 0 && totalSteps > 0) {
+    onNextStep(true);
+  }
+
+  if (currentStep >= totalSteps) {
+    stopAutoPlay(true);
+    return;
+  }
+
+  autoPlayIntervalId = setInterval(() => {
+    onNextStep(true);
+  }, AUTO_PLAY_INTERVAL);
+}
+
+function stopAutoPlay(completed = false) {
+  if (!isAutoPlaying && !completed && autoPlayIntervalId === null) return;
+
+  clearInterval(autoPlayIntervalId);
+  autoPlayIntervalId = null;
+  isAutoPlaying = false;
+  console.log(`[Main] Auto-play stopped. Completed: ${completed}`);
+  updateButtonStates(currentStep, totalSteps, model, isAutoPlaying);
+}
+
+function handleAutoPlay() {
+  if (!model || totalSteps === 0) return;
+
+  if (isAutoPlaying) {
+    stopAutoPlay();
+  } else {
+    if (currentStep >= totalSteps) {
+      currentStep = 0;
+      applyStepVisibility(currentStep);
+      updateStepInfo(currentStep, totalSteps, model);
+    }
+    startAutoPlay();
   }
 }
 
 function onResetView() {
   const viewerContainer = document.getElementById("viewerContainer");
   if (model && viewerContainer) {
-    // Call frameArea, false for autoRotate to not restart it on manual reset
     frameArea(model, getCamera(), getControls(), viewerContainer, false);
     console.log("[Main] View reset by user.");
   } else {
@@ -129,9 +186,12 @@ document.addEventListener("DOMContentLoaded", () => {
     prevStepBtn,
     nextStepBtn,
     resetViewBtn,
+    autoPlayBtn,
     onFileSelected,
     onPrevStep,
     onNextStep,
     onResetView,
+    onAutoPlay: handleAutoPlay,
   });
+  updateButtonStates(currentStep, totalSteps, model, false);
 });
